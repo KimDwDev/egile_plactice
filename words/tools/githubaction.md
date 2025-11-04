@@ -65,4 +65,47 @@ jobs:
 
 ```
 
+- 워크플로에 보면 commit 하고 여기에 문자가 존재한다.
+
+- workflow_dispatch에 경우 workflow에 들어가서 이에 대해서 버튼을 눌렀을때 트리거를 정할 수 있다.
+
+- workflow event brach를 설정해서 이를 정의 할 수 있다. 
+
+- github actions를 이용해서 workflow를 이용해서 이벤트 기반으로 표시할 수 있도록 한다. 
+
+- concurrency를 이용하면 진행중이던 workflow를 취소할 수 있다. (그전에 작업 중이던 workflow를)
+
+- 예를 들어서 진행중이던것을 끈다면 이를 이용해서 더 최신에 나온것을 주로 수행하도록 할 수 있을 것이다.
+
+- 만약에 동시성이 false이면 반드시 앞에 있는 작업이 끝날때 까지 그다음 작업은 하지 않도록 한다.
+
+- 기본적으로 github는 workflow가 6시간이면 작업을 멈추는데 차임아욱 옵션은 지정된 시간 동안 워크플로우가 지속되면 종료 한다. 이때 너무 오랫 동안 워크플로우가 진행되는것을 방지하기 위해서 timeout-minutes를 이용해서 시간 제한을 줄 수 있다. 
+
+- 시간 제한도 정할 수 있다는 점이다. -> workflow에 경우 이 시간을 정해서 timeout을 만들 수 있다.
+
+- 여러 운영체제에 대해서 배포를 할 수 있게 할 수 있고 이에 대해서 병렬로 처리할 수 있게 한다.
+
+- strategy를 사용하면 여러개의 버전이나 운영체제에서 job을 실행하도록 할 수 있는데 이때 사용하는것이 바로 startegy에 matrix이다. 
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16, 18, 20]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm test
+
+```
+
+- 작업이 실행되는 것을 병렬로 할 수 있고 이에 대해서 같이 작업하도록 할 수 있다.
+
+- docker에 alpine이미지는 윈도우에서는 잘 작동을 하지 않는다. 
+
 - 
