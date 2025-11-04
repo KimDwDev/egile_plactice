@@ -1,0 +1,70 @@
+name: NestJS CI/CD
+
+on:
+  push:     # push or pr 이벤트가 이루어 졌을때 발생하는 이벤트
+  pull_request: 
+
+jobs:
+  # ci에 경우
+  ci:
+    runs-on: ubuntu-latest # 우분투 가상 환경을 사용
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 의존성 설치
+        run: npm ci
+
+      - name: NestJS 빌드
+        run: npm run build # build
+ 
+      - name: Jest 테스트
+        run: npm test # test
+
+  # test용 develope 브런치가 업데이트 될때 사용
+  cd_develop:
+    needs: ci # 이건 해야 cd가 가능 
+    runs-on: ubuntu-latest
+
+    # if 문을 사용해서 brancdh와 event 이름을 체킹할 수 있다.
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop'
+
+    steps:
+      - name: 배포용 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: develop 환경 CD 실행 (스테이징 배포)
+        run: |
+          echo "🚀 develop 브랜치로 향하는 PR입니다."
+          echo "여기서 Docker build + push, 스테이징 서버 배포 등을 실행하세요."
+          # 예시:
+          # docker build -t myapp:staging .
+          # docker push my-registry/myapp:staging
+          # ssh를 이용해서 ncp에 접속 후 build ( ip와 비밀번호가 필요하다. )
+
+  # 배포용 
+  cd_main:
+    needs: ci
+    runs-on: ubuntu-latest
+
+    # pull_request 이면서, PR의 타겟 브랜치가 main일 때만 실행
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+
+    steps:
+      - name: 배포용 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: main 환경 CD 실행 배포
+        run: |
+          echo "🚀 main 브랜치로 향하는 PR입니다."
+          echo "여기에서 실제 Docker 기반 프로덕션 배포 스크립트를 실행하세요."
+          # 예시:
+          # docker build -t myapp:prod .
+          # docker push my-registry/myapp:prod
+          # ssh로 접속후 -> docker compose pull && up -d 을 이용해서 처리 
