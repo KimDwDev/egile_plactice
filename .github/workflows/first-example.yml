@@ -1,0 +1,12 @@
+name: Exploring variables and secrets
+
+on:
+  schedule:
+    - cron: "*/1 * * * *"
+
+env:
+  CONTAINER_REGISTRY: docker.io
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
